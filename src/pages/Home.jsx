@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Features from "../components/Features";
 import api from "../services/api";
+import Hero from "../components/Hero";
 
 function Home() {
   const [materials, setMaterials] = useState([]);
@@ -48,42 +49,7 @@ function Home() {
     <>
       <Navbar />
 
-      {/* Hero */}
-
-      <section className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white py-24">
-
-        <div className="max-w-7xl mx-auto px-6 text-center">
-
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
-            🎓 IGU Notes Hub
-          </h1>
-
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-10">
-            One Platform for Notes, Previous Year Papers,
-            Syllabus, Assignments and Study Materials.
-          </p>
-
-          <div className="flex justify-center gap-5 flex-wrap">
-
-            <Link
-              to="/notes"
-              className="bg-white text-blue-700 px-8 py-4 rounded-xl font-bold hover:scale-105 transition"
-            >
-              📚 Browse Notes
-            </Link>
-
-            <Link
-              to="/previous-papers"
-              className="bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold hover:scale-105 transition"
-            >
-              📝 Previous Papers
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
+ <Hero />
 
       {/* Statistics */}
 

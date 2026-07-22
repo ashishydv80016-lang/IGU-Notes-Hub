@@ -18,11 +18,17 @@ import AdminUpload from "./pages/AdminUpload";
 import AdminMaterials from "./pages/AdminMaterials";
 import EditMaterial from "./pages/EditMaterial";
 import Syllabus from "./pages/Syllabus";
+import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
+
+
+// NEW
+import PDFViewer from "./pages/PDFViewer";
 
 function App() {
   return (
     <Routes>
+
       {/* ================= HOME ================= */}
       <Route path="/" element={<Home />} />
 
@@ -38,6 +44,12 @@ function App() {
       <Route
         path="/materials/:id"
         element={<MaterialDetails />}
+      />
+
+      {/* NEW PDF VIEWER */}
+      <Route
+        path="/viewer/:id"
+        element={<PDFViewer />}
       />
 
       {/* ================= AUTH ================= */}
@@ -136,7 +148,10 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/search" element={<Search />} />
+
       <Route path="*" element={<NotFound />} />
+
     </Routes>
   );
 }

@@ -1,125 +1,111 @@
 import { Link } from "react-router-dom";
-import { FaBookOpen, FaDownload, FaFilePdf } from "react-icons/fa";
 
 function Hero() {
   return (
-    <section className="bg-gradient-to-r from-blue-700 to-indigo-700 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white">
 
-      <div className="max-w-7xl mx-auto px-6 py-24">
+      {/* Background Decoration */}
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-white"></div>
 
-          {/* Left Side */}
+        <div className="absolute top-20 right-10 w-60 h-60 rounded-full bg-white"></div>
 
-          <div>
+        <div className="absolute bottom-0 left-1/2 w-96 h-96 rounded-full bg-white"></div>
+      </div>
 
-            <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
-              Welcome to
-              <br />
-              <span className="text-yellow-300">
-                IGU Notes Hub
-              </span>
-            </h1>
+      <div className="relative max-w-7xl mx-auto px-6 py-24">
 
-            <p className="mt-6 text-xl text-blue-100">
-              Download Notes, Previous Year Papers and Syllabus
-              for all IGU courses in one place.
-            </p>
+        {/* Badge */}
 
-            <div className="flex gap-5 mt-10">
+        <div className="flex justify-center">
 
-              <Link
-                to="/notes"
-                className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-4 rounded-xl font-bold"
-              >
-                Browse Notes
-              </Link>
+          <span className="bg-white/20 backdrop-blur-sm px-5 py-2 rounded-full text-sm font-semibold shadow-lg">
 
-              <Link
-                to="/register"
-                className="border-2 border-white px-8 py-4 rounded-xl hover:bg-white hover:text-blue-700 font-bold"
-              >
-                Join Free
-              </Link>
+            🎓 Indira Gandhi University Resource Portal
 
-            </div>
+          </span>
+
+        </div>
+
+        {/* Heading */}
+
+        <h1 className="text-center text-5xl md:text-7xl font-extrabold mt-8 leading-tight">
+
+          IGU Notes Hub
+
+        </h1>
+
+        {/* Subtitle */}
+
+        <p className="text-center text-lg md:text-2xl mt-6 max-w-4xl mx-auto text-gray-100">
+
+          Access Notes, Previous Year Papers, Syllabus,
+          Assignments and Study Materials for all
+          branches and semesters in one place.
+
+        </p>
+
+        {/* Buttons */}
+
+        <div className="flex flex-wrap justify-center gap-5 mt-12">
+
+          <Link
+            to="/notes"
+            className="bg-white text-blue-700 px-8 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition duration-300"
+          >
+            📚 Browse Notes
+          </Link>
+
+          <Link
+            to="/previous-papers"
+            className="bg-yellow-400 text-black px-8 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition duration-300"
+          >
+            📝 Previous Papers
+          </Link>
+
+          <Link
+            to="/syllabus"
+            className="bg-green-500 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition duration-300"
+          >
+            📖 Syllabus
+          </Link>
+
+        </div>
+
+        {/* Quick Statistics */}
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
+
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center border border-white/20">
+
+            <h2 className="text-4xl font-bold">1000+</h2>
+
+            <p className="mt-2">Notes</p>
 
           </div>
 
-          {/* Right Side */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center border border-white/20">
 
-          <div>
+            <h2 className="text-4xl font-bold">500+</h2>
 
-            <div className="bg-white rounded-3xl shadow-2xl p-10">
+            <p className="mt-2">Previous Papers</p>
 
-              <div className="space-y-5">
+          </div>
 
-                <div className="flex items-center gap-4 bg-blue-50 p-5 rounded-xl">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center border border-white/20">
 
-                  <FaBookOpen
-                    className="text-blue-700"
-                    size={35}
-                  />
+            <h2 className="text-4xl font-bold">10+</h2>
 
-                  <div>
+            <p className="mt-2">Branches</p>
 
-                    <h3 className="text-black font-bold">
-                      Study Notes
-                    </h3>
+          </div>
 
-                    <p className="text-gray-600">
-                      Semester-wise notes
-                    </p>
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center border border-white/20">
 
-                  </div>
+            <h2 className="text-4xl font-bold">24×7</h2>
 
-                </div>
-
-                <div className="flex items-center gap-4 bg-green-50 p-5 rounded-xl">
-
-                  <FaFilePdf
-                    className="text-green-700"
-                    size={35}
-                  />
-
-                  <div>
-
-                    <h3 className="text-black font-bold">
-                      Previous Papers
-                    </h3>
-
-                    <p className="text-gray-600">
-                      University Question Papers
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <div className="flex items-center gap-4 bg-orange-50 p-5 rounded-xl">
-
-                  <FaDownload
-                    className="text-orange-600"
-                    size={35}
-                  />
-
-                  <div>
-
-                    <h3 className="text-black font-bold">
-                      Instant Download
-                    </h3>
-
-                    <p className="text-gray-600">
-                      Download PDFs anytime
-                    </p>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
+            <p className="mt-2">Available</p>
 
           </div>
 
