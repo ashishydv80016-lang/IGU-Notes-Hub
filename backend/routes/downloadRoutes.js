@@ -6,7 +6,7 @@ import {
   clearDownloadHistory,
 } from "../controllers/downloadController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

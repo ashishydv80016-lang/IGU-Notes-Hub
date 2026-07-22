@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-export const protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     console.log("\n==============================");
     console.log("METHOD:", req.method);
@@ -39,9 +39,8 @@ export const protect = async (req, res, next) => {
     req.user = user;
 
     next();
-
   } catch (error) {
-    console.log(error);
+    console.error(error);
 
     return res.status(401).json({
       success: false,
@@ -49,3 +48,5 @@ export const protect = async (req, res, next) => {
     });
   }
 };
+
+export default protect;

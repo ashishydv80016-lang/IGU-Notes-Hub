@@ -1,48 +1,43 @@
 import express from "express";
-import multer from "multer";
-import { storage } from "../config/cloudinary.js";
-import {
-  uploadMaterial,
-  getMaterials,
-  deleteMaterial,
-  updateMaterial,
-  getTopMaterials,
-} from "../controllers/materialController.js";
-
-import { protect } from "../middleware/authMiddleware.js";
-import { adminOnly } from "../middleware/adminMiddleware.js";
+import upload from "../middleware/uploadMiddleware.js";
+import { uploadMaterial, getMaterials, getTopMaterials, deleteMaterial, updateMaterial } from "../controllers/materialController.js";
+import protect from "../middleware/authMiddleware.js";
+import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-const upload = multer({ storage });
-
-router.get("/top", getTopMaterials);
-// Public route
 router.get("/", getMaterials);
 
-// Admin only
+router.get("/top", getTopMaterials);
+
 router.post(
   "/upload",
   protect,
-  adminOnly,
-  upload.single("file"),
+  adminMiddleware,
+  (req, res, next) => {
+    upload.single("file")(req, res, function (err) {
+      if (err) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({
+            success: false,
+            message: "PDF size must be less than 10 MB.",
+          });
+        }
+
+        return res.status(400).json({
+          success: false,
+          message: err.message,
+        });
+      }
+
+      next();
+    });
+  },
   uploadMaterial
 );
 
-// Admin only
-router.put(
-  "/:id",
-  protect,
-  adminOnly,
-  updateMaterial
-);
+router.put("/:id", protect, adminMiddleware, updateMaterial);
 
-// Admin only
-router.delete(
-  "/:id",
-  protect,
-  adminOnly,
-  deleteMaterial
-);
+router.delete("/:id", protect, adminMiddleware, deleteMaterial);
 
 export default router;
