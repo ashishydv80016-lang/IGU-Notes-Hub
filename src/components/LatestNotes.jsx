@@ -95,7 +95,7 @@ function LatestNotes({
                 <div className="flex gap-3 mt-6">
 
                   <Link
-                    to={`/material/${note._id}`}
+                    to={`/viewer/${note._id}`}
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg"
                   >
                     👁 View

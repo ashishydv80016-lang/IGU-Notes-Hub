@@ -238,14 +238,12 @@ function PreviousPapers() {
 
                   <div className="grid grid-cols-2 gap-3 pt-4">
 
-  <a
-    href={paper.fileUrl}
-    target="_blank"
-    rel="noreferrer"
+  <Link
+    to={`/viewer/${paper._id}`}
     className="bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg transition"
   >
     👁 View PDF
-  </a>
+  </Link>
 
   <Link
     to={`/materials/${paper._id}`}

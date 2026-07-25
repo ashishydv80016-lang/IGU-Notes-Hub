@@ -160,3 +160,17 @@ export const updateMaterial = async (req, res) => {
     });
   }
 };
+
+export const getMaterialById = async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+
+    if (!material) {
+      return res.status(404).json({ success: false, message: "Material not found" });
+    }
+
+    return res.status(200).json({ success: true, material });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: "Invalid material ID" });
+  }
+};

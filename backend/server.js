@@ -9,6 +9,7 @@ import downloadRoutes from "./routes/downloadRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import adminUserRoutes from "./routes/adminUserRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
+import filterRoutes from "./routes/filterRoutes.js";
 
 dotenv.config();
 import materialRoutes from "./routes/materialRoutes.js";
@@ -26,6 +27,7 @@ app.use("/api/downloads", downloadRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/users", adminUserRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/filters", filterRoutes);
 
 app.get("/", (req, res) => {
   res.send("IGU Notes Hub API is running...");

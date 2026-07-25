@@ -229,14 +229,12 @@ function Notes() {
                   </p>
                                     <div className="grid grid-cols-2 gap-3 mt-6">
 
-                    <a
-                      href={item.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
+                    <Link
+                      to={`/viewer/${item._id}`}
                       className="bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg transition"
                     >
                       👁 View PDF
-                    </a>
+                    </Link>
 
                     <Link
                       to={`/materials/${item._id}`}

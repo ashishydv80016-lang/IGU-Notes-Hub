@@ -21,29 +21,32 @@ function PDFViewer() {
   const [scale, setScale] = useState(1.2);
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchMaterial();
-  }, []);
+    const fetchMaterial = async () => {
+      try {
+        const { data } = await api.get(`/materials/${id}`);
+        const material = data.material;
+        const fileUrl = material.fileUrl || material.pdfUrl;
 
-  const fetchMaterial = async () => {
-    try {
-      const res = await api.get("/materials");
+        if (!fileUrl) {
+          setError("This material does not have a PDF file.");
+          return;
+        }
 
-      const material = res.data.materials.find(
-        (item) => item._id === id
-      );
-
-      if (material) {
-        setPdfUrl(material.fileUrl || material.pdfUrl);
+        setPdfUrl(fileUrl);
         setTitle(material.title);
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || "Unable to load this material.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchMaterial();
+  }, [id]);
 
   const onLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
@@ -55,6 +58,17 @@ function PDFViewer() {
         <h1 className="text-2xl font-bold">
           Loading PDF...
         </h1>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-100 px-4 dark:bg-gray-900">
+        <h1 className="text-2xl font-bold text-red-600">{error}</h1>
+        <button onClick={() => navigate(-1)} className="rounded-lg bg-blue-600 px-5 py-2 text-white">
+          Go back
+        </button>
       </div>
     );
   }

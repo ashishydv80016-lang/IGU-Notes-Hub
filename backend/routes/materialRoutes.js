@@ -1,6 +1,6 @@
 import express from "express";
 import upload from "../middleware/uploadMiddleware.js";
-import { uploadMaterial, getMaterials, getTopMaterials, deleteMaterial, updateMaterial } from "../controllers/materialController.js";
+import { uploadMaterial, getMaterials, getMaterialById, getTopMaterials, deleteMaterial, updateMaterial } from "../controllers/materialController.js";
 import protect from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -9,6 +9,8 @@ const router = express.Router();
 router.get("/", getMaterials);
 
 router.get("/top", getTopMaterials);
+
+router.get("/:id", getMaterialById);
 
 router.post(
   "/upload",
