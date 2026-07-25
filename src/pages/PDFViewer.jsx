@@ -120,10 +120,25 @@ function PDFViewer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-2 py-5">
+        <div className="rounded-lg bg-white p-6 text-center shadow-lg dark:bg-gray-800 md:hidden">
+          <h3 className="text-lg font-semibold dark:text-white">Open this PDF on your device</h3>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            Your mobile browser will use its built-in PDF viewer.
+          </p>
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white"
+          >
+            <Download size={20} />
+            Open PDF
+          </a>
+        </div>
         <iframe
           title={title || "PDF document"}
           src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
-          className="h-[calc(100vh-110px)] min-h-[600px] w-full rounded-lg border bg-white shadow-lg"
+          className="hidden h-[calc(100vh-110px)] min-h-[600px] w-full rounded-lg border bg-white shadow-lg md:block"
         >
           <p>
             Your browser cannot display this PDF. Use the Download button above.
