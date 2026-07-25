@@ -20,8 +20,23 @@ function PDFViewer() {
   useEffect(() => {
     const fetchMaterial = async () => {
       try {
-        const { data } = await api.get(`/materials/${id}`);
-        const material = data.material;
+        let material;
+
+        try {
+          const { data } = await api.get(`/materials/${id}`);
+          material = data.material;
+        } catch (singleMaterialError) {
+          // Keeps the viewer working with an already-deployed API that does not
+          // yet include GET /materials/:id.
+          const { data } = await api.get("/materials");
+          material = data.materials?.find((item) => item._id === id);
+        }
+
+        if (!material) {
+          setError("Material not found.");
+          return;
+        }
+
         const fileUrl = material.fileUrl || material.pdfUrl;
 
         if (!fileUrl) {
