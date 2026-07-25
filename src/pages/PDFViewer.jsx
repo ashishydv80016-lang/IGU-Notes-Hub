@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Document, Page } from "react-pdf";
 import {
   ArrowLeft,
   Download,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 
 import api from "../services/api";
@@ -16,9 +13,6 @@ function PDFViewer() {
 
   const [pdfUrl, setPdfUrl] = useState("");
   const [title, setTitle] = useState("");
-
-  const [numPages, setNumPages] = useState(0);
-  const [scale, setScale] = useState(1.2);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,10 +41,6 @@ function PDFViewer() {
 
     fetchMaterial();
   }, [id]);
-
-  const onLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-  };
 
   if (loading) {
     return (
@@ -114,76 +104,16 @@ function PDFViewer() {
 
       </div>
 
-      {/* ================= ZOOM CONTROLS ================= */}
-
-      <div className="flex justify-center items-center gap-4 py-5">
-
-        <button
-          onClick={() =>
-            setScale((prev) => Math.max(0.5, prev - 0.2))
-          }
-          className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow"
+      <div className="mx-auto max-w-7xl px-2 py-5">
+        <iframe
+          title={title || "PDF document"}
+          src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
+          className="h-[calc(100vh-110px)] min-h-[600px] w-full rounded-lg border bg-white shadow-lg"
         >
-          <ZoomOut />
-        </button>
-
-        <div className="bg-white dark:bg-gray-800 shadow-lg px-6 py-3 rounded-xl font-bold text-lg dark:text-white">
-          {Math.round(scale * 100)}%
-        </div>
-
-        <button
-          onClick={() =>
-            setScale((prev) => Math.min(3, prev + 0.2))
-          }
-          className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow"
-        >
-          <ZoomIn />
-        </button>
-
-      </div>
-
-      {/* ================= PDF ================= */}
-
-      <div className="flex justify-center px-2 pb-10 overflow-auto">
-
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={onLoadSuccess}
-          loading={
-            <div className="text-center text-2xl py-10">
-              Loading PDF...
-            </div>
-          }
-          error={
-            <div className="text-center text-red-600 text-xl py-10">
-              Failed to load PDF.
-            </div>
-          }
-        >
-          {Array.from(
-            new Array(numPages),
-            (_, index) => (
-              <div
-                key={index}
-                className="mb-6 flex justify-center"
-              >
-                <Page
-                  pageNumber={index + 1}
-                  scale={scale}
-                  renderTextLayer={false}
-                  renderAnnotationLayer={false}
-                />
-              </div>
-            )
-          )}
-        </Document>
-
-      </div>
-
-      {/* ================= FOOTER ================= */}
-
-      <div className="text-center pb-8 text-gray-600 dark:text-gray-400 font-semibold">
-        Total Pages : {numPages}
+          <p>
+            Your browser cannot display this PDF. Use the Download button above.
+          </p>
+        </iframe>
       </div>
 
     </div>
