@@ -1,11 +1,15 @@
 import multer from "multer";
-import { storage } from "../config/cloudinary.js";
+
+// Store file in memory instead of uploading directly
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
+
   limits: {
     fileSize: 10 * 1024 * 1024, // 10 MB
   },
+
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== "application/pdf") {
       return cb(new Error("Only PDF files are allowed."));

@@ -5,115 +5,340 @@ import api from "../services/api";
 function Search() {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const [branches, setBranches] = useState([]);
   const [semesters, setSemesters] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [types, setTypes] = useState([]);
+
   const [filters, setFilters] = useState({
     keyword: "",
     branch: "",
     semester: "",
     subject: "",
     type: "",
+    sort: "newest",
   });
 
-  useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const { data } = await api.get("/filters");
-        setBranches(data.branches || []);
-        setSemesters(data.semesters || []);
-        setSubjects(data.subjects || []);
-        setTypes(data.types || []);
-      } catch (error) {
-        console.error("Unable to load search filters:", error);
-      }
-    };
+  // ---------------- Fetch Filter Options ----------------
 
+  const fetchFilters = async () => {
+    try {
+      const res = await api.get("/filters");
+
+      setBranches(res.data.branches || []);
+      setSemesters(res.data.semesters || []);
+      setSubjects(res.data.subjects || []);
+      setTypes(res.data.types || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ---------------- Search Materials ----------------
+
+  const searchMaterials = async () => {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams();
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+          params.append(key, value);
+        }
+      });
+
+      const res = await api.get(`/search?${params.toString()}`);
+
+      setMaterials(res.data.materials || []);
+    } catch (err) {
+      console.error(err);
+      setMaterials([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---------------- Load Initially ----------------
+
+  useEffect(() => {
     fetchFilters();
+    searchMaterials();
   }, []);
 
+  // ---------------- Live Search ----------------
+
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const params = Object.fromEntries(
-          Object.entries(filters).filter(([, value]) => value),
-        );
-        const { data } = await api.get("/search", { params });
-        setMaterials(data.materials || []);
-      } catch (error) {
-        console.error("Unable to search materials:", error);
-        setMaterials([]);
-      } finally {
-        setLoading(false);
-      }
+    const timer = setTimeout(() => {
+      searchMaterials();
     }, 300);
 
     return () => clearTimeout(timer);
   }, [filters]);
 
-  const updateFilter = (key, value) => {
-    setFilters((current) => ({ ...current, [key]: value }));
-  };
+  // ---------------- UI ----------------
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-10 dark:bg-gray-900">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="mb-8 text-center text-4xl font-bold text-blue-700">
-          Search Notes &amp; Previous Papers
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-10 px-4">
+
+      <div className="max-w-7xl mx-auto">
+
+        <h1 className="text-4xl font-bold text-center text-blue-700 mb-10">
+          🔍 Search Notes & Previous Papers
         </h1>
 
-        <div className="mb-8 rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800">
-          <div className="grid gap-4 md:grid-cols-5">
+        {/* Filters */}
+
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-10">
+
+          <div className="grid lg:grid-cols-6 md:grid-cols-3 grid-cols-1 gap-4">
+
+            {/* Keyword */}
+
             <input
               type="text"
               placeholder="Search..."
               value={filters.keyword}
-              onChange={(event) => updateFilter("keyword", event.target.value)}
-              className="rounded-lg border p-3"
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  keyword: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
             />
-            <select value={filters.branch} onChange={(event) => updateFilter("branch", event.target.value)} className="rounded-lg border p-3">
+
+            {/* Branch */}
+
+            <select
+              value={filters.branch}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  branch: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
+            >
               <option value="">All Branches</option>
-              {branches.map((branch) => <option key={branch} value={branch}>{branch}</option>)}
+
+              {branches.map((branch) => (
+                <option key={branch} value={branch}>
+                  {branch}
+                </option>
+              ))}
             </select>
-            <select value={filters.semester} onChange={(event) => updateFilter("semester", event.target.value)} className="rounded-lg border p-3">
+
+            {/* Semester */}
+
+            <select
+              value={filters.semester}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  semester: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
+            >
               <option value="">All Semesters</option>
-              {semesters.map((semester) => <option key={semester} value={semester}>{semester}</option>)}
+
+              {semesters.map((semester) => (
+                <option key={semester} value={semester}>
+                  {semester}
+                </option>
+              ))}
             </select>
-            <select value={filters.subject} onChange={(event) => updateFilter("subject", event.target.value)} className="rounded-lg border p-3">
+
+            {/* Subject */}
+
+            <select
+              value={filters.subject}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  subject: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
+            >
               <option value="">All Subjects</option>
-              {subjects.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
+
+              {subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
             </select>
-            <select value={filters.type} onChange={(event) => updateFilter("type", event.target.value)} className="rounded-lg border p-3">
+
+            {/* Type */}
+
+            <select
+              value={filters.type}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  type: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
+            >
               <option value="">All Types</option>
-              {types.map((type) => <option key={type} value={type}>{type}</option>)}
+
+              {types.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
+
+            {/* Sort */}
+
+            <select
+              value={filters.sort}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  sort: e.target.value,
+                })
+              }
+              className="border rounded-xl p-3"
+            >
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="downloads">Most Downloaded</option>
+              <option value="az">A → Z</option>
+            </select>
+
           </div>
+
+          {/* Bottom */}
+
+          <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
+
+            <h2 className="font-semibold text-lg">
+              📚 Showing {materials.length} Material
+              {materials.length !== 1 ? "s" : ""}
+            </h2>
+
+            <button
+              onClick={() =>
+                setFilters({
+                  keyword: "",
+                  branch: "",
+                  semester: "",
+                  subject: "",
+                  type: "",
+                  sort: "newest",
+                })
+              }
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl"
+            >
+              Clear Filters
+            </button>
+
+          </div>
+
         </div>
 
+        {/* Loading */}
+
         {loading ? (
-          <h2 className="text-center text-xl font-semibold">Searching...</h2>
-        ) : materials.length === 0 ? (
-          <h2 className="text-center text-xl">No materials found.</h2>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-3">
-            {materials.map((item) => (
-              <div key={item._id} className="rounded-xl bg-white p-6 shadow-lg transition hover:shadow-xl dark:bg-gray-800">
-                <h2 className="text-2xl font-bold text-blue-700">{item.title}</h2>
-                <p className="mt-3"><strong>Subject:</strong> {item.subject}</p>
-                <p><strong>Branch:</strong> {item.branch}</p>
-                <p><strong>Semester:</strong> {item.semester}</p>
-                <p><strong>Type:</strong> {item.type}</p>
-                <div className="mt-5 flex gap-3">
-                  <Link to={`/viewer/${item._id}`} className="rounded-lg bg-blue-600 px-4 py-2 text-white">View</Link>
-                  <a href={item.fileUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-green-600 px-4 py-2 text-white">Download</a>
-                </div>
-              </div>
-            ))}
+
+          <div className="flex justify-center py-20">
+
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+
           </div>
+
+        ) : materials.length === 0 ? (
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 text-center">
+
+            <h2 className="text-3xl font-bold">
+              📂 No Materials Found
+            </h2>
+
+            <p className="mt-3 text-gray-500">
+              Try another keyword or filter.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-8">
+
+            {materials.map((item) => (
+
+              <div
+                key={item._id}
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition overflow-hidden"
+              >
+
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5">
+
+                  <h2 className="text-white text-xl font-bold">
+                    {item.title}
+                  </h2>
+
+                </div>
+
+                <div className="p-5 space-y-2">
+
+                  <p>
+                    <strong>📚 Subject:</strong> {item.subject}
+                  </p>
+
+                  <p>
+                    <strong>🏫 Branch:</strong> {item.branch}
+                  </p>
+
+                  <p>
+                    <strong>🎓 Semester:</strong> {item.semester}
+                  </p>
+
+                  <p>
+                    <strong>📄 Type:</strong> {item.type}
+                  </p>
+
+                  <p>
+                    <strong>📥 Downloads:</strong> {item.downloads || 0}
+                  </p>
+
+                  <div className="flex gap-3 mt-5">
+
+                    <Link
+                      to={`/viewer/${item._id}`}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-center"
+                    >
+                      📖 View
+                    </Link>
+
+                    <a
+                      href={item.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl text-center"
+                    >
+                      📥 Download
+                    </a>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
         )}
+
       </div>
+
     </div>
   );
 }

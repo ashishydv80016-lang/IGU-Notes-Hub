@@ -1,23 +1,57 @@
 import Material from "../models/Material.js";
+import User from "../models/User.js";
+import streamifier from "streamifier";
+import cloudinary from "../config/cloudinary.js";
 
 // ==========================================
 // Upload Material
 // ==========================================
 export const uploadMaterial = async (req, res) => {
   try {
-    console.log("========== UPLOAD ==========");
+    console.log("========== NEW UPLOAD CONTROLLER ==========");
     console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
     console.log("USER:", req.user);
+    console.log("FILE:", req.file);
 
     const { title, branch, semester, subject, type } = req.body;
 
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Please upload a PDF file.",
+        message: "Please upload a PDF.",
       });
     }
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "IGU_Notes_Hub",
+          resource_type: "auto",
+          use_filename: true,
+          unique_filename: true,
+          overwrite: false,
+        },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary Upload Error:");
+            console.error(error);
+            return reject(error);
+          }
+
+          console.log("========== CLOUDINARY RESPONSE ==========");
+          console.log(result);
+
+          resolve(result);
+        }
+      );
+
+      streamifier
+        .createReadStream(req.file.buffer)
+        .pipe(uploadStream);
+    });
+
+    console.log("========== SAVING TO MONGODB ==========");
+    console.log(uploadResult.secure_url);
 
     const material = await Material.create({
       title,
@@ -25,11 +59,11 @@ export const uploadMaterial = async (req, res) => {
       semester,
       subject,
       type,
-      fileUrl: req.file.path,
+      fileUrl: uploadResult.secure_url,
       uploadedBy: req.user?._id || null,
     });
 
-    console.log("✅ Material Saved Successfully");
+    console.log("========== MATERIAL SAVED ==========");
     console.log(material);
 
     return res.status(201).json({
@@ -38,7 +72,7 @@ export const uploadMaterial = async (req, res) => {
       material,
     });
   } catch (error) {
-    console.error("❌ UPLOAD ERROR:");
+    console.error("========== UPLOAD ERROR ==========");
     console.error(error);
 
     return res.status(500).json({

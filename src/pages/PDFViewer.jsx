@@ -3,9 +3,23 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Download,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+
 import api from "../services/api";
+
+// PDF Worker
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
 
 function PDFViewer() {
   const navigate = useNavigate();
@@ -17,6 +31,10 @@ function PDFViewer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [numPages, setNumPages] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(1.2);
+
   useEffect(() => {
     const fetchMaterial = async () => {
       try {
@@ -25,30 +43,21 @@ function PDFViewer() {
         try {
           const { data } = await api.get(`/materials/${id}`);
           material = data.material;
-        } catch (singleMaterialError) {
-          // Keeps the viewer working with an already-deployed API that does not
-          // yet include GET /materials/:id.
+        } catch {
           const { data } = await api.get("/materials");
-          material = data.materials?.find((item) => item._id === id);
+          material = data.materials.find((item) => item._id === id);
         }
 
         if (!material) {
-          setError("Material not found.");
+          setError("Material not found");
           return;
         }
 
-        const fileUrl = material.fileUrl || material.pdfUrl;
-
-        if (!fileUrl) {
-          setError("This material does not have a PDF file.");
-          return;
-        }
-
-        setPdfUrl(fileUrl);
         setTitle(material.title);
+        setPdfUrl(material.fileUrl || material.pdfUrl);
       } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || "Unable to load this material.");
+        setError("Unable to load PDF");
       } finally {
         setLoading(false);
       }
@@ -57,37 +66,65 @@ function PDFViewer() {
     fetchMaterial();
   }, [id]);
 
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setPageNumber(1);
+  };
+
+  const nextPage = () => {
+    if (pageNumber < numPages) {
+      setPageNumber((prev) => prev + 1);
+    }
+  };
+
+  const previousPage = () => {
+    if (pageNumber > 1) {
+      setPageNumber((prev) => prev - 1);
+    }
+  };
+
+  const zoomIn = () => {
+    setScale((prev) => prev + 0.2);
+  };
+
+  const zoomOut = () => {
+    if (scale > 0.6) {
+      setScale((prev) => prev - 0.2);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center bg-gray-100 dark:bg-gray-900">
-        <h1 className="text-2xl font-bold">
-          Loading PDF...
-        </h1>
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-bold">Loading PDF...</h1>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-100 px-4 dark:bg-gray-900">
-        <h1 className="text-2xl font-bold text-red-600">{error}</h1>
-        <button onClick={() => navigate(-1)} className="rounded-lg bg-blue-600 px-5 py-2 text-white">
-          Go back
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-bold text-red-600">
+          {error}
+        </h1>
+
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+        >
+          Go Back
         </button>
       </div>
     );
   }
-
-  return (
+    return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
 
-      {/* ================= HEADER ================= */}
+      {/* Header */}
 
       <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-lg">
 
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-4">
-
-          {/* Back */}
 
           <button
             onClick={() => navigate(-1)}
@@ -97,13 +134,9 @@ function PDFViewer() {
             Back
           </button>
 
-          {/* Title */}
-
-          <h2 className="text-xl md:text-2xl font-bold text-center flex-1 text-gray-800 dark:text-white">
+          <h2 className="flex-1 text-center text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
             {title}
           </h2>
-
-          {/* Download */}
 
           <a
             href={pdfUrl}
@@ -119,31 +152,89 @@ function PDFViewer() {
 
       </div>
 
-      <div className="mx-auto max-w-7xl px-2 py-5">
-        <div className="rounded-lg bg-white p-6 text-center shadow-lg dark:bg-gray-800 md:hidden">
-          <h3 className="text-lg font-semibold dark:text-white">Open this PDF on your device</h3>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            Your mobile browser will use its built-in PDF viewer.
-          </p>
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-5 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white"
-          >
-            <Download size={20} />
-            Open PDF
-          </a>
-        </div>
-        <iframe
-          title={title || "PDF document"}
-          src={`${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1`}
-          className="hidden h-[calc(100vh-110px)] min-h-[600px] w-full rounded-lg border bg-white shadow-lg md:block"
+      {/* Zoom Controls */}
+
+      <div className="flex justify-center items-center gap-4 py-5">
+
+        <button
+          onClick={zoomOut}
+          className="bg-gray-700 hover:bg-gray-800 text-white p-3 rounded-full"
         >
-          <p>
-            Your browser cannot display this PDF. Use the Download button above.
-          </p>
-        </iframe>
+          <ZoomOut size={20} />
+        </button>
+
+        <span className="font-bold text-lg dark:text-white">
+          {(scale * 100).toFixed(0)}%
+        </span>
+
+        <button
+          onClick={zoomIn}
+          className="bg-gray-700 hover:bg-gray-800 text-white p-3 rounded-full"
+        >
+          <ZoomIn size={20} />
+        </button>
+
+      </div>
+
+      {/* PDF */}
+
+      <div className="flex justify-center px-3">
+
+        <div className="bg-white rounded-xl shadow-xl p-4 overflow-auto">
+
+          <Document
+            file={pdfUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            loading={
+              <h2 className="text-xl font-bold text-center">
+                Loading PDF...
+              </h2>
+            }
+            error={
+              <h2 className="text-red-600 font-bold text-center">
+                Unable to load PDF
+              </h2>
+            }
+          >
+
+            <Page
+              pageNumber={pageNumber}
+              scale={scale}
+              renderAnnotationLayer={true}
+              renderTextLayer={true}
+            />
+
+          </Document>
+
+        </div>
+
+      </div>
+            {/* Navigation */}
+
+      <div className="flex flex-wrap justify-center items-center gap-5 py-8">
+
+        <button
+          onClick={previousPage}
+          disabled={pageNumber <= 1}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-5 py-2 rounded-lg transition"
+        >
+          <ChevronLeft size={20} />
+          Previous
+        </button>
+
+        <div className="text-lg font-bold dark:text-white">
+          Page {pageNumber} of {numPages || 0}
+        </div>
+
+        <button
+          onClick={nextPage}
+          disabled={pageNumber >= numPages}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-5 py-2 rounded-lg transition"
+        >
+          Next
+          <ChevronRight size={20} />
+        </button>
+
       </div>
 
     </div>
