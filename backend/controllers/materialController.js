@@ -26,7 +26,7 @@ export const uploadMaterial = async (req, res) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: "IGU_Notes_Hub",
-          resource_type: "auto",
+          resource_type: "raw",
           use_filename: true,
           unique_filename: true,
           overwrite: false,
