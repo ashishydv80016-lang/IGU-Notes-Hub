@@ -5,37 +5,85 @@ import Download from "../models/Download.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
-    // ===============================
+    // ==========================
     // Dashboard Statistics
-    // ===============================
+    // ==========================
 
-    const totalUsers = await User.countDocuments();
+    const [
+      totalUsers,
+      totalMaterials,
+      totalFavorites,
+      totalDownloads,
+      recentMaterials,
+      topDownloads,
+      latestUsers,
+    ] = await Promise.all([
+      User.countDocuments(),
+      Material.countDocuments(),
+      Favorite.countDocuments(),
+      Download.countDocuments(),
 
-    const totalMaterials = await Material.countDocuments();
+      Material.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate("uploadedBy", "name email"),
 
-    const totalFavorites = await Favorite.countDocuments();
+      Material.find()
+        .sort({ downloads: -1 })
+        .limit(5)
+        .populate("uploadedBy", "name"),
 
-    const totalDownloads = await Download.countDocuments();
+      User.find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("-password"),
+    ]);
 
-    // ===============================
-    // Recent Uploaded Materials
-    // ===============================
+    // ==========================
+    // Branch Statistics
+    // ==========================
 
-    const recentMaterials = await Material.find()
-      .sort({ createdAt: -1 })
-      .limit(5);
+    const branchStats = await Material.aggregate([
+      {
+        $group: {
+          _id: "$branch",
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { total: -1 },
+      },
+    ]);
 
-    // ===============================
-    // Top Downloaded Materials
-    // ===============================
+    // ==========================
+    // Semester Statistics
+    // ==========================
 
-    const topDownloads = await Material.find()
-      .sort({ downloads: -1 })
-      .limit(5);
+    const semesterStats = await Material.aggregate([
+      {
+        $group: {
+          _id: "$semester",
+          total: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
 
-    // ===============================
+    // ==========================
+    // Recent Upload Count
+    // ==========================
+
+    const uploadsThisWeek = await Material.countDocuments({
+      createdAt: {
+        $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    // ==========================
     // Response
-    // ===============================
+    // ==========================
 
     res.status(200).json({
       success: true,
@@ -45,19 +93,25 @@ export const getDashboardStats = async (req, res) => {
         totalMaterials,
         totalFavorites,
         totalDownloads,
+        uploadsThisWeek,
       },
 
       recentMaterials,
 
       topDownloads,
-    });
 
+      latestUsers,
+
+      branchStats,
+
+      semesterStats,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Dashboard Error:", error);
 
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: "Failed to load dashboard",
     });
   }
 };
