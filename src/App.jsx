@@ -20,6 +20,12 @@ import EditMaterial from "./pages/EditMaterial";
 import Syllabus from "./pages/Syllabus";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Disclaimer from "./pages/Disclaimer";
+import Test from "./pages/Test";
 
 
 // NEW
@@ -150,7 +156,33 @@ function App() {
       />
       <Route path="/search" element={<Search />} />
 
-      <Route path="*" element={<NotFound />} />
+      <Route path="/search" element={<Search />} />
+
+
+{/* ================= ADSENSE PAGES ================= */}
+
+<Route path="/about" element={<About />} />
+
+<Route path="/contact" element={<Contact />} />
+
+<Route
+  path="/privacy-policy"
+  element={<Privacy />}
+/>
+
+<Route 
+  path="/terms" 
+  element={<Terms />} 
+/>
+
+<Route 
+  path="/disclaimer" 
+  element={<Disclaimer />} 
+/>
+<Route path="/test" element={<Test />} />
+
+
+<Route path="*" element={<NotFound />} />
 
     </Routes>
   );

@@ -1,18 +1,30 @@
 @import "tailwindcss";
 
-
-/* Enable class based dark mode */
-
+/* Enable class-based dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
-
-body {
-  background: white;
-  color: black;
+* {
+  box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #111827;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 .dark body {
-  background: #111827;
-  color: white;
+  background-color: #111827;
+  color: #ffffff;
 }
