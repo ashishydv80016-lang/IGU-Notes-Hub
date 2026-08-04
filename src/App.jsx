@@ -156,7 +156,7 @@ function App() {
       />
       <Route path="/search" element={<Search />} />
 
-      <Route path="/search" element={<Search />} />
+     
 
 
 {/* ================= ADSENSE PAGES ================= */}
