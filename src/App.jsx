@@ -25,7 +25,7 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Disclaimer from "./pages/Disclaimer";
-import Test from "./pages/Test";
+
 
 
 // NEW
@@ -179,7 +179,7 @@ function App() {
   path="/disclaimer" 
   element={<Disclaimer />} 
 />
-<Route path="/test" element={<Test />} />
+
 
 
 <Route path="*" element={<NotFound />} />
