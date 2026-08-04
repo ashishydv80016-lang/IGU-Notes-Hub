@@ -1,23 +1,51 @@
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+
 function About() {
   return (
-    <main className="min-h-screen bg-white text-gray-900 px-4 py-12">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-6 text-3xl font-bold">
+    <>
+      <Navbar />
+
+      <div className="max-w-5xl mx-auto px-6 py-12">
+
+        <h1 className="text-4xl font-bold text-blue-700 mb-6">
           About IGU Notes Hub
         </h1>
 
-        <p className="mb-4 leading-7">
-          IGU Notes Hub is an independent educational platform created to help
-          students easily access notes, previous-year question papers, syllabi,
-          and other academic resources.
+        <p className="text-lg leading-8 mb-5">
+          IGU Notes Hub is an educational platform created
+          to help students of Indira Gandhi University
+          access study materials easily.
         </p>
 
-        <p className="leading-7">
-          Our goal is to make useful study materials easier to find for
-          university students.
+        <p className="text-lg leading-8 mb-5">
+          Our goal is to provide students with organized
+          notes, previous year question papers, syllabus
+          information and useful academic resources for
+          better exam preparation.
         </p>
+
+        <p className="text-lg leading-8 mb-5">
+          Students can explore materials according to
+          their branch, semester and subjects, making it
+          easier to find the right resources at the right
+          time.
+        </p>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4">
+          Our Mission
+        </h2>
+
+        <p className="text-lg leading-8">
+          Our mission is to make quality educational
+          resources easily accessible for university
+          students and support better learning.
+        </p>
+
       </div>
-    </main>
+
+      <Footer />
+    </>
   );
 }
 
