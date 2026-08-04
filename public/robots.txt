@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://igu-notes-hub.vercel.app/sitemap.xml
